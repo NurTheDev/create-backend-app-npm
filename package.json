@@ -1,10 +1,8 @@
 {
   "name": "nur-create-backend",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "description": "CLI to scaffold an Express + MongoDB backend with routing, error handling, and sample models/controllers.",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "bin": {
     "nur-create-backend": "index.js"
   },
@@ -13,9 +11,23 @@
     "cli",
     "backend",
     "express",
-    "starter"
+    "starter",
+    "mongoose"
   ],
   "author": "Nur Islam",
   "license": "MIT",
-  "description": "Scaffold backend project"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NurTheDev/create-backend-app-npm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NurTheDev/create-backend-app-npm/issues"
+  },
+  "homepage": "https://github.com/NurTheDev/create-backend-app-npm#readme",
+  "engines": {
+    "node": ">=16"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
 }

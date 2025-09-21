@@ -321,7 +321,7 @@ const argv = process.argv.slice(2);
 const projectName = argv[0];
 
 if (!projectName) {
-  console.log("Usage: create-backend-app <project-name>");
+  console.log("Usage: nur-create-backend <project-name>");
   process.exit(1);
 }
 
