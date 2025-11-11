@@ -310,6 +310,21 @@ npm run dev
       2
     );
   },
+  envExample: function (projectName) {
+    return `# MongoDB Connection
+MONGO_URI=mongodb://127.0.0.1:27017/${projectName || "myapp"}
+
+# Environment
+NODE_ENV=development
+
+# API Configuration
+API_VERSION=/api/v1
+PORT=5000
+
+# Add your JWT secret, API keys, etc.
+# JWT_SECRET=your-secret-key-here
+`;
+  },
 };
 
 async function writeFileSafe(filePath, content) {
@@ -427,12 +442,17 @@ if (existsSync(target)) {
       templates.packageJSON(projectName)
     );
     await writeFileSafe(path.join(target, "public/.gitkeep"), "");
+    await writeFileSafe(
+      path.join(target, ".env.example"),
+      templates.envExample(projectName)
+    );
 
     console.log("✅ Project created at", target);
     console.log("Next steps:");
     console.log(`  cd ${projectName}`);
     console.log("  npm install");
-    console.log("  create a .env file with MONGO_URI and run npm run dev");
+    console.log("  cp .env.example .env  # Edit with your values");
+    console.log("  npm run dev");
   } catch (err) {
     console.error("Error:", err);
     process.exit(1);
