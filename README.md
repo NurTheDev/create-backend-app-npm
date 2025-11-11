@@ -2,7 +2,21 @@
 
 A zero‑configuration CLI to scaffold a structured Express + MongoDB backend with clean architecture helpers, routing, error handling, and sample models/controllers.
 
-![npm version](https://img.shields.io/npm/v/nur-create-backend) ![license](https://img.shields.io/badge/license-MIT-green)
+![npm version](https://img.shields.io/npm/v/nur-create-backend)
+![npm downloads](https://img.shields.io/npm/dt/nur-create-backend)
+![license](https://img.shields.io/badge/license-MIT-green)
+![node version](https://img.shields.io/node/v/nur-create-backend)
+
+## 🎯 Features
+
+- ✅ Zero configuration setup
+- 📁 Clean, scalable folder structure
+- 🔒 Built-in error handling (dev/prod modes)
+- 🔄 Hot reload with nodemon
+- 📝 Mongoose models with timestamps
+- 🛣️ Versioned API routes
+- 🎨 CORS & Morgan logging configured
+- 🧪 Test folder ready
 
 ## ✨ What It Generates
 
@@ -50,6 +64,18 @@ cd my-api
 npm install
 cp .env.example .env   # (You will create the .env file manually; see below)
 npm run dev
+```
+
+## 📸 What You Get
+
+```
+✅ Structured Express app
+✅ MongoDB connection ready
+✅ Sample User & Post models
+✅ Authentication & User routes
+✅ Global error handling
+✅ Environment configuration
+✅ Ready for production deployment
 ```
 
 ## 🛠 CLI Usage
@@ -142,35 +168,50 @@ npm start     # production-style run
 
 ## 🌐 Default Routes
 
-After starting the server:
+After starting the server, test these endpoints:
 
-Base URL pattern (with default `API_VERSION=/api/v1`):
-```
-/api/v1/users
-/api/v1/auth/login
-```
-
-Test them (after `npm run dev`):
+**GET Users**
 
 ```bash
 curl http://localhost:5000/api/v1/users
-curl -X POST http://localhost:5000/api/v1/auth/login
+
+# Response:
+{
+  "message": "Users fetched",
+  "data": [{ "id": 1, "name": "Demo User" }],
+  "statusCode": 200,
+  "status": "success"
+}
 ```
 
-Responses are placeholder JSON objects.
+**POST Login**
+
+```bash
+curl -X POST http://localhost:5000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"123456"}'
+
+# Response:
+{
+  "message": "Logged in",
+  "data": { "token": "demo-token" },
+  "statusCode": 200,
+  "status": "success"
+}
+```
 
 ## 🧱 Architecture & Helpers
 
-| Component | Purpose |
-|----------|---------|
-| `asyncHandler.js` | Wraps async route handlers; forwards errors to global handler |
-| `customError.js` | Custom error class (operational vs generic) |
-| `developmentError.js` | Detailed stack trace JSON output |
-| `productionError.js` | Sanitized error response |
-| `globalError.js` | Chooses dev vs prod handler |
-| `apiResponse.js` | `success(res, data, message)` standardized success shape |
-| `constants.js` | Centralizes `PORT` & `MONGO_URI` resolution |
-| `db.js` | Mongoose connection with safety checks |
+| Component             | Purpose                                                       |
+| --------------------- | ------------------------------------------------------------- |
+| `asyncHandler.js`     | Wraps async route handlers; forwards errors to global handler |
+| `customError.js`      | Custom error class (operational vs generic)                   |
+| `developmentError.js` | Detailed stack trace JSON output                              |
+| `productionError.js`  | Sanitized error response                                      |
+| `globalError.js`      | Chooses dev vs prod handler                                   |
+| `apiResponse.js`      | `success(res, data, message)` standardized success shape      |
+| `constants.js`        | Centralizes `PORT` & `MONGO_URI` resolution                   |
+| `db.js`               | Mongoose connection with safety checks                        |
 
 ## 🗄 Models (Sample)
 
@@ -231,23 +272,37 @@ describe("Sample", () => {
 
 ## 🚀 Suggested Next Features
 
-| Priority | Feature | Notes |
-|----------|---------|-------|
-| High | .env example generator | Provide `.env.example` automatically |
-| High | Add a help flag (`-h/--help`) | Improve UX |
-| Medium | CLI flags (e.g., `--git`, `--typescript`) | Expand flexibility |
-| Medium | Dockerfile scaffold | Quick containerization |
-| Medium | Auth template (JWT) | Starter tokens & middleware |
-| Low | Logging abstraction (Winston/Pino) | Production logging |
+| Priority | Feature                                   | Notes                                |
+| -------- | ----------------------------------------- | ------------------------------------ |
+| High     | .env example generator                    | Provide `.env.example` automatically |
+| High     | Add a help flag (`-h/--help`)             | Improve UX                           |
+| Medium   | CLI flags (e.g., `--git`, `--typescript`) | Expand flexibility                   |
+| Medium   | Dockerfile scaffold                       | Quick containerization               |
+| Medium   | Auth template (JWT)                       | Starter tokens & middleware          |
+| Low      | Logging abstraction (Winston/Pino)        | Production logging                   |
 
 ## 🐞 Troubleshooting
 
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Mongo connection fails | Wrong `MONGO_URI` | Update `.env` |
-| CLI says folder exists | Target directory already present | Choose a new project name |
-| No colored output | Basic console logs only | Integrate chalk / kleur |
-| Undefined API prefix | `API_VERSION` not set | Accept default or define in `.env` |
+| Issue                  | Cause                            | Fix                                |
+| ---------------------- | -------------------------------- | ---------------------------------- |
+| Mongo connection fails | Wrong `MONGO_URI`                | Update `.env`                      |
+| CLI says folder exists | Target directory already present | Choose a new project name          |
+| No colored output      | Basic console logs only          | Integrate chalk / kleur            |
+| Undefined API prefix   | `API_VERSION` not set            | Accept default or define in `.env` |
+
+## ❓ FAQ
+
+**Q: Can I use TypeScript?**
+A: Not yet, but it's on the roadmap! For now, you can manually convert the files.
+
+**Q: Does it support PostgreSQL?**
+A: Currently MongoDB only. We may add other database options in future versions.
+
+**Q: Is authentication included?**
+A: Basic auth structure is scaffolded, but you need to implement JWT/bcrypt logic.
+
+**Q: Can I deploy this to production?**
+A: Yes! Just set `NODE_ENV=production` and configure your production MongoDB URI.
 
 ## 📦 Uninstall (Global CLI)
 
