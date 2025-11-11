@@ -33,7 +33,7 @@ Running the command creates a new folder containing:
 Using `npx` (recommended – always latest version):
 
 ```bash
-npx nur-create-backend my-api
+npx nur-create-backend server
 ```
 
 Or install globally:
