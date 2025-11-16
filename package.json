@@ -1,6 +1,6 @@
 {
   "name": "nur-create-backend",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "CLI to scaffold an Express + MongoDB backend with routing, error handling, and sample models/controllers.",
   "main": "index.js",
   "bin": {
@@ -12,7 +12,10 @@
     "backend",
     "express",
     "starter",
-    "mongoose"
+    "mongoose",
+    "boilerplate",
+    "generator",
+    "api"
   ],
   "author": "Nur Islam",
   "license": "MIT",
@@ -29,5 +32,10 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "ora": "^5.4.1"
   }
 }
