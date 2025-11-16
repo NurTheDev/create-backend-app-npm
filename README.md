@@ -9,45 +9,47 @@ A zero‑configuration CLI to scaffold a structured Express + MongoDB backend wi
 
 ## 🎯 Features
 
-- ✅ Zero configuration setup
-- 📁 Clean, scalable folder structure
-- 🔒 Built-in error handling (dev/prod modes)
-- 🔄 Hot reload with nodemon
-- 📝 Mongoose models with timestamps
-- 🛣️ Versioned API routes
-- 🎨 CORS & Morgan logging configured
-- 🧪 Test folder ready
+- ✅ **Zero configuration** - Get started instantly
+- 🎨 **Beautiful CLI** - Colorful output with loading spinners
+- 📁 **Clean folder structure** - Scalable and maintainable
+- 🔒 **Built-in error handling** - Dev/prod modes
+- 🔄 **Hot reload** - Auto-restart with nodemon
+- 📝 **Mongoose models** - Pre-configured with timestamps
+- 🛣️ **Versioned API routes** - `/api/v1` by default
+- 🌐 **CORS & logging** - Morgan logging configured
+- 💚 **Health check** - Built-in `/health` endpoint
+- 🚨 **404 handler** - Proper error responses
 
 ## ✨ What It Generates
 
 Running the command creates a new folder containing:
 
 - `server.js` – Entry point (loads env, connects MongoDB, starts Express)
-- `src/app.js` – Express app with JSON + URL-encoded parsing, CORS, morgan logging, versioned API mount
+- `src/app.js` – Express app with JSON parsing, CORS, morgan logging, versioned API
 - `src/config/` – DB connection (`db.js`), constants (`constants.js`)
-- `src/helpers/` – Error handling pipeline (dev/prod), async wrapper, response helper
+- `src/helpers/` – Error handling pipeline, async wrapper, response helper
 - `src/routes/` – Top-level `index.js` plus versioned API route folders
 - `src/routes/api/` – `userRoutes.js`, `authRoutes.js`
 - `src/controllers/` – Sample `userController.js`, `authController.js`
 - `src/models/` – Sample `User.js`, `Post.js` Mongoose models
 - `public/` & `tests/` placeholders
 - `package.json` – With scripts + dependencies
-- `.gitignore`
+- `.gitignore` – Node.js best practices
+- `.env.example` – Environment variable template
 - Project README (basic template)
-- Placeholder `.gitkeep` for `public/`
 
 ## 🧩 Prerequisites
 
 - Node.js 16+ (recommend 18+)
 - npm (or another package manager)
-- A running MongoDB instance (local or Atlas) if you want DB connectivity to succeed
+- A running MongoDB instance (local or Atlas)
 
 ## 🚀 Quick Start
 
 Using `npx` (recommended – always latest version):
 
 ```bash
-npx nur-create-backend server
+npx nur-create-backend my-api
 ```
 
 Or install globally:
@@ -62,95 +64,122 @@ Then:
 ```bash
 cd my-api
 npm install
-cp .env.example .env   # (You will create the .env file manually; see below)
+cp .env.example .env   # Edit with your MongoDB URI
 npm run dev
 ```
 
-## 📸 What You Get
+## 📸 CLI Output
 
 ```
-✅ Structured Express app
-✅ MongoDB connection ready
-✅ Sample User & Post models
-✅ Authentication & User routes
-✅ Global error handling
-✅ Environment configuration
-✅ Ready for production deployment
+🚀 Creating your backend app...
+
+✓ Setting up folder structure...
+✓ Writing configuration files...
+✓ Creating helper functions...
+✓ Setting up controllers and routes...
+✓ Creating database models...
+✓ Finalizing project setup...
+✓ ✅ Project created successfully!
+
+📦 Next steps:
+
+  cd my-api
+  npm install
+  cp .env.example .env
+  npm run dev
+
+🎉 Happy coding!
 ```
 
 ## 🛠 CLI Usage
+
+### Basic Usage
 
 ```bash
 nur-create-backend <project-name>
 ```
 
-Example:
+### Options
 
 ```bash
-npx nur-create-backend blog-api
+nur-create-backend --help       # Show help
+nur-create-backend --version    # Show version
+nur-create-backend -v my-api    # Verbose output
 ```
 
-If the target folder already exists, the CLI aborts with a message.
+### Examples
 
-> NOTE: Currently there are no flags (like `--typescript` or `--git`). Feel free to add them later.
+```bash
+# Create a blog API
+npx nur-create-backend blog-api
+
+# Create with verbose output
+npx nur-create-backend my-app --verbose
+```
+
+If the target folder already exists, the CLI will abort with a helpful message.
 
 ## 📂 Folder Structure (Generated)
 
 ```
 my-api/
-  server.js
-  package.json
-  .gitignore
-  README.md
-  public/
-    .gitkeep
-  src/
-    app.js
-    config/
-      db.js
-      constants.js
-    controllers/
-      userController.js
-      authController.js
-    helpers/
-      asyncHandler.js
-      customError.js
-      developmentError.js
-      productionError.js
-      globalError.js
-      apiResponse.js
-    models/
-      User.js
-      Post.js
-    routes/
-      index.js
-      api/
-        userRoutes.js
-        authRoutes.js
-  tests/
+├── server.js
+├── package.json
+├── .gitignore
+├── .env.example
+├── README.md
+├── public/
+│   └── .gitkeep
+├── src/
+│   ├── app.js
+│   ├── config/
+│   │   ├── db.js
+│   │   └── constants.js
+│   ├── controllers/
+│   │   ├── userController.js
+│   │   └── authController.js
+│   ├── helpers/
+│   │   ├── asyncHandler.js
+│   │   ├── customError.js
+│   │   ├── developmentError.js
+│   │   ├── productionError.js
+│   │   ├── globalError.js
+│   │   └── apiResponse.js
+│   ├── models/
+│   │   ├── User.js
+│   │   └── Post.js
+│   ├── routes/
+│   │   ├── index.js
+│   │   └── api/
+│   │       ├── userRoutes.js
+│   │       └── authRoutes.js
+│   ├── middlewares/
+│   ├── services/
+│   └── utils/
+└── tests/
 ```
 
 ## 🔑 Environment Variables
 
 Create a `.env` file in the generated project root:
 
-```
+```env
 MONGO_URI=mongodb://127.0.0.1:27017/my-api
 NODE_ENV=development
 API_VERSION=/api/v1
 PORT=5000
 ```
 
-- `MONGO_URI` (required for DB connection to succeed)
-- `NODE_ENV` controls verbose error output (`development` vs anything else)
-- `API_VERSION` sets the prefix used in `app.js` (defaults to `/api/v1`)
-- `PORT` optional (defaults internally to `5000`)
+- `MONGO_URI` (required for DB connection)
+- `NODE_ENV` controls error output (`development` vs `production`)
+- `API_VERSION` sets the API prefix (defaults to `/api/v1`)
+- `PORT` optional (defaults to `5000`)
 
 ## ▶️ Running the App
 
 Scripts (from generated `package.json`):
 
-```jsonc
+```json
 {
   "scripts": {
     "start": "node server.js",
@@ -170,7 +199,19 @@ npm start     # production-style run
 
 After starting the server, test these endpoints:
 
-**GET Users**
+### Health Check
+
+```bash
+curl http://localhost:5000/health
+
+# Response:
+{
+  "status": "OK",
+  "message": "Server is running"
+}
+```
+
+### GET Users
 
 ```bash
 curl http://localhost:5000/api/v1/users
@@ -184,7 +225,7 @@ curl http://localhost:5000/api/v1/users
 }
 ```
 
-**POST Login**
+### POST Login
 
 ```bash
 curl -X POST http://localhost:5000/api/v1/auth/login \
@@ -200,6 +241,19 @@ curl -X POST http://localhost:5000/api/v1/auth/login \
 }
 ```
 
+### 404 Handler
+
+```bash
+curl http://localhost:5000/api/v1/nonexistent
+
+# Response:
+{
+  "statusCode": 404,
+  "message": "Route not found",
+  "status": "error"
+}
+```
+
 ## 🧱 Architecture & Helpers
 
 | Component             | Purpose                                                       |
@@ -210,7 +264,7 @@ curl -X POST http://localhost:5000/api/v1/auth/login \
 | `productionError.js`  | Sanitized error response                                      |
 | `globalError.js`      | Chooses dev vs prod handler                                   |
 | `apiResponse.js`      | `success(res, data, message)` standardized success shape      |
-| `constants.js`        | Centralizes `PORT` & `MONGO_URI` resolution                   |
+| `constants.js`        | Centralizes `PORT`, `MONGO_URI`, `API_VERSION` resolution     |
 | `db.js`               | Mongoose connection with safety checks                        |
 
 ## 🗄 Models (Sample)
@@ -265,44 +319,49 @@ describe("Sample", () => {
 
 ## 🔐 Security Considerations
 
-- Add password hashing (e.g., `bcrypt`) in `User` model logic (not provided).
-- Implement validation (Joi/Zod) for request bodies.
-- Add authentication (JWT, session) middleware.
-- Sanitize inputs & enable rate limiting (`express-rate-limit`).
+- Add password hashing (e.g., `bcrypt`) in `User` model logic
+- Implement validation (Joi/Zod) for request bodies
+- Add authentication (JWT, session) middleware
+- Sanitize inputs & enable rate limiting (`express-rate-limit`)
 
-## 🚀 Suggested Next Features
+## 🚀 Roadmap
 
-| Priority | Feature                                   | Notes                                |
-| -------- | ----------------------------------------- | ------------------------------------ |
-| High     | .env example generator                    | Provide `.env.example` automatically |
-| High     | Add a help flag (`-h/--help`)             | Improve UX                           |
-| Medium   | CLI flags (e.g., `--git`, `--typescript`) | Expand flexibility                   |
-| Medium   | Dockerfile scaffold                       | Quick containerization               |
-| Medium   | Auth template (JWT)                       | Starter tokens & middleware          |
-| Low      | Logging abstraction (Winston/Pino)        | Production logging                   |
+| Priority | Feature                                   | Status      |
+| -------- | ----------------------------------------- | ----------- |
+| High     | JWT authentication template               | 📋 Planned  |
+| High     | TypeScript support (`--typescript`)       | 📋 Planned  |
+| Medium   | Interactive mode (prompts)                | 📋 Planned  |
+| Medium   | Docker scaffold (`--docker`)              | 📋 Planned  |
+| Medium   | PostgreSQL/MySQL support                  | 📋 Planned  |
+| Low      | Logging abstraction (Winston/Pino)        | 📋 Planned  |
+| Low      | Testing setup (Jest/Vitest)               | 📋 Planned  |
 
 ## 🐞 Troubleshooting
 
-| Issue                  | Cause                            | Fix                                |
-| ---------------------- | -------------------------------- | ---------------------------------- |
-| Mongo connection fails | Wrong `MONGO_URI`                | Update `.env`                      |
-| CLI says folder exists | Target directory already present | Choose a new project name          |
-| No colored output      | Basic console logs only          | Integrate chalk / kleur            |
-| Undefined API prefix   | `API_VERSION` not set            | Accept default or define in `.env` |
+| Issue                      | Cause                            | Fix                                |
+| -------------------------- | -------------------------------- | ---------------------------------- |
+| Mongo connection fails     | Wrong `MONGO_URI`                | Update `.env`                      |
+| CLI says folder exists     | Target directory already present | Choose a new project name          |
+| Missing colorful output    | Terminal doesn't support colors  | Use a modern terminal              |
+| Undefined API prefix       | `API_VERSION` not set            | Accept default or define in `.env` |
+| `npm install` errors       | Old Node.js version              | Upgrade to Node.js 16+             |
 
 ## ❓ FAQ
 
-**Q: Can I use TypeScript?**
-A: Not yet, but it's on the roadmap! For now, you can manually convert the files.
+**Q: Can I use TypeScript?**  
+A: TypeScript support is coming soon! For now, you can manually convert the files.
 
-**Q: Does it support PostgreSQL?**
-A: Currently MongoDB only. We may add other database options in future versions.
+**Q: Does it support PostgreSQL?**  
+A: Currently MongoDB only. Other databases are on the roadmap.
 
-**Q: Is authentication included?**
+**Q: Is authentication included?**  
 A: Basic auth structure is scaffolded, but you need to implement JWT/bcrypt logic.
 
-**Q: Can I deploy this to production?**
+**Q: Can I deploy this to production?**  
 A: Yes! Just set `NODE_ENV=production` and configure your production MongoDB URI.
+
+**Q: How do I update to the latest version?**  
+A: Use `npx nur-create-backend@latest` or run `npm update -g nur-create-backend` if installed globally.
 
 ## 📦 Uninstall (Global CLI)
 
@@ -313,14 +372,24 @@ npm uninstall -g nur-create-backend
 ## 🤝 Contributing
 
 1. Fork the repo
-2. Create a feature branch (`feat/add-help-flag`)
-3. Commit changes
-4. Open a Pull Request
+2. Create a feature branch (`git checkout -b feat/amazing-feature`)
+3. Commit changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to branch (`git push origin feat/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
 MIT © 2025 Nur Islam
 
+## 🙏 Acknowledgments
+
+Built with ❤️ using:
+- [Express](https://expressjs.com/) - Fast web framework
+- [Mongoose](https://mongoosejs.com/) - MongoDB ODM
+- [Commander](https://github.com/tj/commander.js/) - CLI framework
+- [Chalk](https://github.com/chalk/chalk) - Terminal colors
+- [Ora](https://github.com/sindresorhus/ora) - Terminal spinners
+
 ---
 
-If this project helps you bootstrap faster, a ⭐ on the repository is appreciated!
+⭐ **If this project helps you, please give it a star on [GitHub](https://github.com/NurTheDev/create-backend-app-npm)!**
