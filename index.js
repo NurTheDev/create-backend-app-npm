@@ -2,15 +2,14 @@
 // javascript
 const fs = require("fs/promises");
 const path = require("path");
-const { existsSync } = require("fs");
-const { Command } = require("commander");
+const {existsSync} = require("fs");
+const {Command} = require("commander");
 const chalk = require("chalk");
 const ora = require("ora");
-
+const pkg = require("./package.json");
 const templates = {
-  serverJS: function (projectName) {
-    return `const dotenv = require("dotenv");
-dotenv.config();
+    serverJS: function (projectName) {
+        return `
 const app = require("./src/app.js");
 const { connectDB } = require("./src/config/db.js");
 const { PORT } = require("./src/config/constants.js");
@@ -25,9 +24,9 @@ start().catch((err) => {
   process.exit(1);
 });
 `;
-  },
+    },
 
-  appJS: `const express = require("express");
+    appJS: `const express = require("express");
 const { globalErrorHandler } = require("./helpers/globalError");
 const cors = require("cors");
 const morgan = require("morgan");
@@ -64,8 +63,8 @@ app.use(globalErrorHandler);
 module.exports = app;
 `,
 
-  dbJS: function (projectName) {
-    return `const mongoose = require("mongoose");
+    dbJS: function (projectName) {
+        return `const mongoose = require("mongoose");
 const { MONGO_URI } = require("./constants.js");
 
 const connectDB = async () => {
@@ -83,13 +82,13 @@ const connectDB = async () => {
 
 module.exports = { connectDB };
 `;
-  },
+    },
 
-  constantsJS: function (projectName) {
-    return `const PORT = process.env.PORT || 5000;
+    constantsJS: function (projectName) {
+        return `const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/${
-        projectName || "myapp"
-    }";
+            projectName || "myapp"
+        }";
 const NODE_ENV = process.env.NODE_ENV || "development";
 const API_VERSION = process.env.API_VERSION || "/api/v1";
 
@@ -100,9 +99,9 @@ module.exports = {
   API_VERSION,
 };
 `;
-  },
+    },
 
-  asyncHandler: `const asyncHandler = (fn) => {
+    asyncHandler: `const asyncHandler = (fn) => {
   return async (req, res, next) => {
     try {
       await fn(req, res, next);
@@ -114,7 +113,7 @@ module.exports = {
 module.exports = { asyncHandler };
 `,
 
-  customError: `class CustomError extends Error {
+    customError: `class CustomError extends Error {
   constructor(message, statusCode = 500) {
     super(message);
     this.message = message || "Something went wrong";
@@ -128,7 +127,7 @@ module.exports = { asyncHandler };
 module.exports = { CustomError };
 `,
 
-  developmentError: `const developmentError = (err, res) => {
+    developmentError: `const developmentError = (err, res) => {
   const statusCode = err.statusCode || 500;
   res.status(statusCode).json({
     message: err.message,
@@ -142,7 +141,7 @@ module.exports = { CustomError };
 module.exports = developmentError;
 `,
 
-  productionError: `const productionError = (err, res) => {
+    productionError: `const productionError = (err, res) => {
   const statusCode = err.statusCode || 500;
   if (err.isOperational) {
     res.status(statusCode).json({
@@ -163,7 +162,7 @@ module.exports = developmentError;
 module.exports = productionError;
 `,
 
-  globalError: `require("dotenv").config();
+    globalError: `
 const developmentError = require("./developmentError");
 const productionError = require("./productionError");
 
@@ -182,7 +181,7 @@ const globalErrorHandler = (err, req, res, next) => {
 module.exports = { globalErrorHandler };
 `,
 
-  apiResponse: `// controllers call: success(res, data, message, statusCode?)
+    apiResponse: `// controllers call: success(res, data, message, statusCode?)
 function success(res, data = {}, message = "Success", statusCode = 200) {
   const response = {
     message,
@@ -196,7 +195,7 @@ function success(res, data = {}, message = "Success", statusCode = 200) {
 module.exports = { success };
 `,
 
-  userController: `const { asyncHandler } = require("../helpers/asyncHandler");
+    userController: `const { asyncHandler } = require("../helpers/asyncHandler");
 const { success } = require("../helpers/apiResponse");
 
 // demo controller
@@ -208,7 +207,7 @@ const getUsers = asyncHandler(async (req, res) => {
 module.exports = { getUsers };
 `,
 
-  authController: `const { asyncHandler } = require("../helpers/asyncHandler");
+    authController: `const { asyncHandler } = require("../helpers/asyncHandler");
 const { success } = require("../helpers/apiResponse");
 
 const login = asyncHandler(async (req, res) => {
@@ -219,7 +218,7 @@ const login = asyncHandler(async (req, res) => {
 module.exports = { login };
 `,
 
-  indexRoutes: `const express = require("express");
+    indexRoutes: `const express = require("express");
 const router = express.Router();
 
 // mount api sub-routers (these are under src/routes/api)
@@ -232,7 +231,7 @@ router.use("/auth", authRouter);
 module.exports = router;
 `,
 
-  userApiRoutes: `const express = require("express");
+    userApiRoutes: `const express = require("express");
 const { getUsers } = require("../../controllers/userController");
 const router = express.Router();
 
@@ -241,7 +240,7 @@ router.route("/").get(getUsers);
 module.exports = router;
 `,
 
-  authApiRoutes: `const express = require("express");
+    authApiRoutes: `const express = require("express");
 const { login } = require("../../controllers/authController");
 const router = express.Router();
 
@@ -250,7 +249,7 @@ router.route("/login").post(login);
 module.exports = router;
 `,
 
-  userModel: `const mongoose = require("mongoose");
+    userModel: `const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
@@ -264,7 +263,7 @@ const userSchema = new mongoose.Schema(
 module.exports = mongoose.model("User", userSchema);
 `,
 
-  postModel: `const mongoose = require("mongoose");
+    postModel: `const mongoose = require("mongoose");
 
 const postSchema = new mongoose.Schema(
   {
@@ -278,7 +277,7 @@ const postSchema = new mongoose.Schema(
 module.exports = mongoose.model("Post", postSchema);
 `,
 
-  gitignore: `node_modules
+    gitignore: `node_modules
 .env
 dist
 npm-debug.log
@@ -287,8 +286,8 @@ npm-debug.log
 coverage
 `,
 
-  readme: function (projectName) {
-    return `# ${projectName}
+    readme: function (projectName) {
+        return `# ${projectName}
 Generated by **nur-create-backend**
 
 ## 🚀 Quick Start
@@ -313,7 +312,7 @@ npm run dev
 ## 📋 Available Scripts
 
 - \`npm start\` - Start the server in production mode
-- \`npm run dev\` - Start with nodemon (auto-reload)
+- \`npm run dev\` - Start (auto-reload)
 
 ## 🌐 API Endpoints
 
@@ -346,37 +345,34 @@ See \`.env.example\` for required environment variables.
 
 MIT
 `;
-  },
+    },
 
-  packageJSON: function (projectName) {
-    return JSON.stringify(
-        {
-          name: projectName,
-          version: "0.1.0",
-          private: true,
-          main: "server.js",
-          scripts: {
-            start: "node server.js",
-            dev: "nodemon server.js",
-          },
-          dependencies: {
-            express: "^4.18.2",
-            mongoose: "^7.0.0",
-            dotenv: "^16.0.0",
-            cors: "^2.8.5",
-            morgan: "^1.10.0",
-          },
-          devDependencies: {
-            nodemon: "^3.1.10",
-          },
-        },
-        null,
-        2
-    );
-  },
+    packageJSON: function (projectName) {
+        return JSON.stringify(
+            {
+                name: projectName,
+                version: "0.1.0",
+                private: true,
+                main: "server.js",
+                scripts: {
+                    start: "node --env-file=.env server.js",
+                    dev: "node --env-file=.env --watch server.js"
+                },
+                dependencies: {
+                    express: "^4.18.2",
+                    mongoose: "^7.0.0",
+                    cors: "^2.8.5",
+                    morgan: "^1.10.0",
+                },
+                devDependencies: {},
+            },
+            null,
+            2
+        );
+    },
 
-  envExample: function (projectName) {
-    return `# MongoDB Connection
+    envExample: function (projectName) {
+        return `# MongoDB Connection
 MONGO_URI=mongodb://127.0.0.1:27017/${projectName || "myapp"}
 
 # Environment
@@ -389,12 +385,12 @@ PORT=5000
 # Add your JWT secret, API keys, etc.
 # JWT_SECRET=your-secret-key-here
 `;
-  },
+    },
 };
 
 async function writeFileSafe(filePath, content) {
-  await fs.mkdir(path.dirname(filePath), { recursive: true });
-  await fs.writeFile(filePath, content, "utf8");
+    await fs.mkdir(path.dirname(filePath), {recursive: true});
+    await fs.writeFile(filePath, content, "utf8");
 }
 
 // Initialize Commander
@@ -403,159 +399,159 @@ const program = new Command();
 program
     .name("nur-create-backend")
     .description("🛠️  CLI to scaffold a production-ready Express + MongoDB backend")
-    .version("1.0.2")
+    .version(pkg.version)
     .argument("<project-name>", "Name of your project")
     .option("-v, --verbose", "Show detailed output")
     .action(async (projectName, options) => {
-      const target = path.resolve(process.cwd(), projectName);
+        const target = path.resolve(process.cwd(), projectName);
 
-      // Check if folder exists
-      if (existsSync(target)) {
-        console.log(chalk.red("❌ Error:"), `Folder "${projectName}" already exists!`);
-        console.log(chalk.yellow("💡 Tip:"), "Choose a different project name");
-        process.exit(1);
-      }
-
-      console.log(chalk.cyan.bold("\n🚀 Creating your backend app...\n"));
-
-      const spinner = ora("Setting up folder structure...").start();
-
-      try {
-        // Create directories
-        const dirs = [
-          "src/config",
-          "src/controllers",
-          "src/routes",
-          "src/routes/api",
-          "src/models",
-          "src/middlewares",
-          "src/services",
-          "src/utils",
-          "src/helpers",
-          "tests",
-          "public",
-        ];
-
-        for (const d of dirs) {
-          await fs.mkdir(path.join(target, d), { recursive: true });
+        // Check if folder exists
+        if (existsSync(target)) {
+            console.log(chalk.red("❌ Error:"), `Folder "${projectName}" already exists!`);
+            console.log(chalk.yellow("💡 Tip:"), "Choose a different project name");
+            process.exit(1);
         }
 
-        spinner.text = "Writing configuration files...";
+        console.log(chalk.cyan.bold("\n🚀 Creating your backend app...\n"));
 
-        // Write files
-        await writeFileSafe(
-            path.join(target, "server.js"),
-            templates.serverJS(projectName)
-        );
-        await writeFileSafe(path.join(target, "src/app.js"), templates.appJS);
-        await writeFileSafe(
-            path.join(target, "src/config/db.js"),
-            templates.dbJS(projectName)
-        );
-        await writeFileSafe(
-            path.join(target, "src/config/constants.js"),
-            templates.constantsJS(projectName)
-        );
+        const spinner = ora("Setting up folder structure...").start();
 
-        spinner.text = "Creating helper functions...";
+        try {
+            // Create directories
+            const dirs = [
+                "src/config",
+                "src/controllers",
+                "src/routes",
+                "src/routes/api",
+                "src/models",
+                "src/middlewares",
+                "src/services",
+                "src/utils",
+                "src/helpers",
+                "tests",
+                "public",
+            ];
 
-        await writeFileSafe(
-            path.join(target, "src/helpers/asyncHandler.js"),
-            templates.asyncHandler
-        );
-        await writeFileSafe(
-            path.join(target, "src/helpers/customError.js"),
-            templates.customError
-        );
-        await writeFileSafe(
-            path.join(target, "src/helpers/developmentError.js"),
-            templates.developmentError
-        );
-        await writeFileSafe(
-            path.join(target, "src/helpers/productionError.js"),
-            templates.productionError
-        );
-        await writeFileSafe(
-            path.join(target, "src/helpers/globalError.js"),
-            templates.globalError
-        );
-        await writeFileSafe(
-            path.join(target, "src/helpers/apiResponse.js"),
-            templates.apiResponse
-        );
+            for (const d of dirs) {
+                await fs.mkdir(path.join(target, d), {recursive: true});
+            }
 
-        spinner.text = "Setting up controllers and routes...";
+            spinner.text = "Writing configuration files...";
 
-        await writeFileSafe(
-            path.join(target, "src/controllers/userController.js"),
-            templates.userController
-        );
-        await writeFileSafe(
-            path.join(target, "src/controllers/authController.js"),
-            templates.authController
-        );
-        await writeFileSafe(
-            path.join(target, "src/routes/index.js"),
-            templates.indexRoutes
-        );
-        await writeFileSafe(
-            path.join(target, "src/routes/api/userRoutes.js"),
-            templates.userApiRoutes
-        );
-        await writeFileSafe(
-            path.join(target, "src/routes/api/authRoutes.js"),
-            templates.authApiRoutes
-        );
+            // Write files
+            await writeFileSafe(
+                path.join(target, "server.js"),
+                templates.serverJS(projectName)
+            );
+            await writeFileSafe(path.join(target, "src/app.js"), templates.appJS);
+            await writeFileSafe(
+                path.join(target, "src/config/db.js"),
+                templates.dbJS(projectName)
+            );
+            await writeFileSafe(
+                path.join(target, "src/config/constants.js"),
+                templates.constantsJS(projectName)
+            );
 
-        spinner.text = "Creating database models...";
+            spinner.text = "Creating helper functions...";
 
-        await writeFileSafe(
-            path.join(target, "src/models/User.js"),
-            templates.userModel
-        );
-        await writeFileSafe(
-            path.join(target, "src/models/Post.js"),
-            templates.postModel
-        );
+            await writeFileSafe(
+                path.join(target, "src/helpers/asyncHandler.js"),
+                templates.asyncHandler
+            );
+            await writeFileSafe(
+                path.join(target, "src/helpers/customError.js"),
+                templates.customError
+            );
+            await writeFileSafe(
+                path.join(target, "src/helpers/developmentError.js"),
+                templates.developmentError
+            );
+            await writeFileSafe(
+                path.join(target, "src/helpers/productionError.js"),
+                templates.productionError
+            );
+            await writeFileSafe(
+                path.join(target, "src/helpers/globalError.js"),
+                templates.globalError
+            );
+            await writeFileSafe(
+                path.join(target, "src/helpers/apiResponse.js"),
+                templates.apiResponse
+            );
 
-        spinner.text = "Finalizing project setup...";
+            spinner.text = "Setting up controllers and routes...";
 
-        await writeFileSafe(path.join(target, ".gitignore"), templates.gitignore);
-        await writeFileSafe(
-            path.join(target, "README.md"),
-            templates.readme(projectName)
-        );
-        await writeFileSafe(
-            path.join(target, "package.json"),
-            templates.packageJSON(projectName)
-        );
-        await writeFileSafe(path.join(target, "public/.gitkeep"), "");
-        await writeFileSafe(
-            path.join(target, ".env.example"),
-            templates.envExample(projectName)
-        );
+            await writeFileSafe(
+                path.join(target, "src/controllers/userController.js"),
+                templates.userController
+            );
+            await writeFileSafe(
+                path.join(target, "src/controllers/authController.js"),
+                templates.authController
+            );
+            await writeFileSafe(
+                path.join(target, "src/routes/index.js"),
+                templates.indexRoutes
+            );
+            await writeFileSafe(
+                path.join(target, "src/routes/api/userRoutes.js"),
+                templates.userApiRoutes
+            );
+            await writeFileSafe(
+                path.join(target, "src/routes/api/authRoutes.js"),
+                templates.authApiRoutes
+            );
 
-        spinner.succeed(chalk.green("✅ Project created successfully!"));
+            spinner.text = "Creating database models...";
 
-        // Success message
-        console.log(chalk.cyan("\n📦 Next steps:\n"));
-        console.log(chalk.white(`  cd ${chalk.yellow(projectName)}`));
-        console.log(chalk.white(`  ${chalk.yellow("npm install")}`));
-        console.log(
-            chalk.white(
-                `  ${chalk.yellow("cp .env.example .env")}  ${chalk.gray("# Edit with your values")}`
-            )
-        );
-        console.log(chalk.white(`  ${chalk.yellow("npm run dev")}\n`));
-        console.log(chalk.green("🎉 Happy coding!\n"));
-      } catch (err) {
-        spinner.fail(chalk.red("❌ Error creating project"));
-        console.error(chalk.red("\nError details:"), err.message);
-        if (options.verbose) {
-          console.error(err);
+            await writeFileSafe(
+                path.join(target, "src/models/User.js"),
+                templates.userModel
+            );
+            await writeFileSafe(
+                path.join(target, "src/models/Post.js"),
+                templates.postModel
+            );
+
+            spinner.text = "Finalizing project setup...";
+
+            await writeFileSafe(path.join(target, ".gitignore"), templates.gitignore);
+            await writeFileSafe(
+                path.join(target, "README.md"),
+                templates.readme(projectName)
+            );
+            await writeFileSafe(
+                path.join(target, "package.json"),
+                templates.packageJSON(projectName)
+            );
+            await writeFileSafe(path.join(target, "public/.gitkeep"), "");
+            await writeFileSafe(
+                path.join(target, ".env.example"),
+                templates.envExample(projectName)
+            );
+
+            spinner.succeed(chalk.green("✅ Project created successfully!"));
+
+            // Success message
+            console.log(chalk.cyan("\n📦 Next steps:\n"));
+            console.log(chalk.white(`  cd ${chalk.yellow(projectName)}`));
+            console.log(chalk.white(`  ${chalk.yellow("npm install")}`));
+            console.log(
+                chalk.white(
+                    `  ${chalk.yellow("cp .env.example .env")}  ${chalk.gray("# Edit with your values")}`
+                )
+            );
+            console.log(chalk.white(`  ${chalk.yellow("npm run dev")}\n`));
+            console.log(chalk.green("🎉 Happy coding!\n"));
+        } catch (err) {
+            spinner.fail(chalk.red("❌ Error creating project"));
+            console.error(chalk.red("\nError details:"), err.message);
+            if (options.verbose) {
+                console.error(err);
+            }
+            process.exit(1);
         }
-        process.exit(1);
-      }
     });
 
 program.parse();
